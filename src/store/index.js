@@ -66,7 +66,6 @@ const dataSlice = createSlice({
                 obj[`bms ${i}`]=[];    
             obj[`bms ${i}`].push(temp[i]);
         }
-        // console.log(obj);
         state.temp = obj;
     }
     

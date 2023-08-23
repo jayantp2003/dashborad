@@ -3,7 +3,7 @@ import VpBoard from './headerRow';
 import { Layout} from 'antd';
 import styled from 'styled-components';
 import Customers from './Boards';
-const { Sider } = Layout;
+
 
 
 const Dashboard = ()=>{

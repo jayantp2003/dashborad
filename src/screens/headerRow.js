@@ -59,11 +59,8 @@ font-weight : 700;
 const HeaderRow = () => {
   const bms = useSelector((state) => state.bms);
   const cells = useSelector((state) => state.cells);
-  const current = useSelector((state) => state.current);
   const dispatch = useDispatch()
-  const  connectToDevice = async () => {
-    
-  }
+
 
   useEffect(() => {
     dispatch(dataAction.setBMS());

@@ -45,19 +45,6 @@ background-color: white;
 border-radius: 12px;
 `;
 
-const colors = ["#F1416C","#00B2FF",'#50CD89', "#8950FC"];
-const images = ['images/avatar.png','images/avatar2.png','images/avatar3.png','images/avatar4.png'];
-const valuation = [
-  { amt:"$ 8,000,000", type:"High Business Value" },{ amt:"$ 11,000,000", type:"High Business Value" },
-  { amt:"$ 6,000,000", type:"High Business Value" },{ amt:"$ 2,500,000", type:"Medium Business Value" },
-  { amt:"$ 1,600,000", type:"Medium Business Value" },{ amt:"$ 700,000", type:"Low Business Value" },
-  { amt:"$ 200,000", type:"Low Business Value" },{ amt:"$ 500,000", type:"Low Business Value" },
-  { amt:"$ 4,000,000", type:"Medium Business Value" },{ amt:"$ 1,000,000", type:"Medium Business Value" }
-];
-
-function randomNumberInRange(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 
 const BMSTable = styled(Table)`
@@ -126,7 +113,7 @@ const Customers = () => {
   const current = useSelector((state) => state.current);
   const num_bms = useSelector((state) => state.bms);
   const [td,setTD] = useState([]);
-  const data = [];
+ 
   
   useEffect(() => {
     if(voltage['bms 0']&& temp['bms 0'] != undefined){
@@ -152,17 +139,7 @@ const Customers = () => {
   }, [voltage,current,temp])
    
   
-  for (let i = 0; i < 100; i++) {
-    data.push({
-      key: i,
-      name: [`BMS ${i+1}`, images[i%4]],
-      companyValuation: valuation[i%10],
-      renewalrate: [randomNumberInRange(1,99), colors[i%4]],
-      churnrate: [randomNumberInRange(1,99), colors[i%4]],
-      satisfaction: [randomNumberInRange(1,9), colors[i%4]],
-      upsell: [randomNumberInRange(1,99), colors[i%4]],
-    });
-  }
+  
     return (
         <Container>
             <Heading children="Dynamic data"/>
