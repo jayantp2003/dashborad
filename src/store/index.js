@@ -27,7 +27,7 @@ const dataSlice = createSlice({
         var data = "V=0,80;1,2;2,4;3,8;4,2;5,6;6,2;7,2;8,1;9,0;10,99;11,32;12,2;13,6;14,2;15,2;16,1;17,0;18,99;19,32;20,13;"
         var slicedData = data.substring(2).split(';');
         slicedData.pop();
-        var num_bms = slicedData.length%16==0 ? parseInt(slicedData.length/16) :parseInt(slicedData.length/16)+1;
+        var num_bms = slicedData.length%16==0 ? parseInt(slicedData.length/16) : parseInt(slicedData.length/16)+1;
         var vol = Array.from({ length: num_bms }, () => Array(16).fill(undefined));
         
         for(var i=0;i<num_bms;i++){

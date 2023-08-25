@@ -56,6 +56,30 @@ const BMSTable = styled(Table)`
     color : #B5B5C3;
   }
 `;
+const GreenButton = styled.div`
+margin-top: auto;
+display: flex;
+padding: 8px 16px;
+background-color: #C9F7F5;
+border-radius: 6px;
+color: #1BC5BD;
+cursor:pointer;
+font-family: Poppins;
+font-size: 12px;
+justify-content: center;
+align-items: center;
+font-weight : 700;
+&:hover{
+  color: #C9F7F5;
+  background-color: #1BC5BD;
+}
+`;
+
+const HeadingRow = styled.div`
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+`;
 const columns = [
   
   {
@@ -142,7 +166,10 @@ const Customers = () => {
   
     return (
         <Container>
-            <Heading children="Dynamic data"/>
+            <HeadingRow >
+              <Heading children="Dynamic data"/>
+              <GreenButton>Export</GreenButton>
+            </HeadingRow>
       <SizedBox/>
      
       { <TableContainer>
