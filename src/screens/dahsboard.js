@@ -18,7 +18,9 @@ const Dashboard = ()=>{
     <AppContainer>
        <Layout >
         <VpBoard/>
+    
         <Customers/>
+        
       </Layout>
       
       

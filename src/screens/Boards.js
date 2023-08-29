@@ -3,6 +3,11 @@ import React, { useState, useEffect } from 'react'
 import Heading from '../components/heading'
 import styled from 'styled-components'
 import { useSelector, useDispatch } from 'react-redux';
+import VoltageRadialChart from '../components/VoltageRadialChart';
+import * as am5 from "@amcharts/amcharts5";
+import TempRadialChart from '../components/tempRadialChart';
+import { saveAs } from 'file-saver';
+
 const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -56,56 +61,31 @@ const BMSTable = styled(Table)`
     color : #B5B5C3;
   }
 `;
-const columns = [
-  
-  {
-    title: 'Name',
-    dataIndex: 'key',
-    key: '1',
-    width: 100,
-    render: (key) => 
-    <TableCellContainer2>
-      <CustomerText>{`BMS ${key+1}`}</CustomerText>
-    </TableCellContainer2>
-  },
-  {
-    title: 'Current',
-    dataIndex: 'current',
-    key: '2',
-    width: 80,
-    render: (current) => 
-    <TableCellContainer2>
-      <TableText2>{current}</TableText2>
-    </TableCellContainer2>
-  },
+const GreenButton = styled.div`
+margin-top: auto;
+display: flex;
+padding: 8px 16px;
+background-color: #C9F7F5;
+border-radius: 6px;
+color: #1BC5BD;
+cursor:pointer;
+font-family: Poppins;
+font-size: 12px;
+justify-content: center;
+align-items: center;
+font-weight : 700;
+&:hover{
+  color: #C9F7F5;
+  background-color: #1BC5BD;
+}
+`;
 
-];
-for(var i=0;i<16;i++){
-  var v = `v ${i}`;
-  columns.push({
-    title: `V ${i+1}`,
-    dataIndex: v,
-    key:  i+3,
-    width: 80,
-    render: (v) => 
-    <TableCellContainer2>
-      <TableText2>{v}</TableText2>
-    </TableCellContainer2>
-  })
-}
-for(var i=0;i<5;i++){
-  var t = `t ${i}`;
-  columns.push({
-    title: `T ${i+1}`,
-    dataIndex: t,
-    key:  i+19,
-    width: 80,
-    render: (t) => 
-    <TableCellContainer2>
-      <TableText2>{t}</TableText2>
-    </TableCellContainer2>
-  })
-}
+const HeadingRow = styled.div`
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+`;
+
 
 const Customers = () => {
   const voltage = useSelector((state) => state.voltage);
@@ -113,7 +93,60 @@ const Customers = () => {
   const current = useSelector((state) => state.current);
   const num_bms = useSelector((state) => state.bms);
   const [td,setTD] = useState([]);
- 
+  const [showGraph, setShowGraph] = useState(0);
+  const columns = [
+  
+    {
+      title: 'Name',
+      dataIndex: 'key',
+      key: '1',
+      width: 100,
+      render: (key) => 
+      <TableCellContainer2>
+        <CustomerText onClick={()=>{
+          setShowGraph(key);
+          console.log(key);
+        }}>{`BMS ${key+1}`}</CustomerText>
+      </TableCellContainer2>
+    },
+    {
+      title: 'Current',
+      dataIndex: 'current',
+      key: '2',
+      width: 80,
+      render: (current) => 
+      <TableCellContainer2>
+        <TableText2>{current}</TableText2>
+      </TableCellContainer2>
+    },
+  
+  ];
+  for(var i=0;i<16;i++){
+    var v = `v ${i}`;
+    columns.push({
+      title: `V ${i+1}`,
+      dataIndex: v,
+      key:  i+3,
+      width: 80,
+      render: (v) => 
+      <TableCellContainer2>
+        <TableText2>{v}</TableText2>
+      </TableCellContainer2>
+    })
+  }
+  for(var i=0;i<5;i++){
+    var t = `t ${i}`;
+    columns.push({
+      title: `T ${i+1}`,
+      dataIndex: t,
+      key:  i+19,
+      width: 80,
+      render: (t) => 
+      <TableCellContainer2>
+        <TableText2>{t}</TableText2>
+      </TableCellContainer2>
+    })
+  }
   
   useEffect(() => {
     if(voltage['bms 0']&& temp['bms 0'] != undefined){
@@ -138,13 +171,67 @@ const Customers = () => {
 
   }, [voltage,current,temp])
    
+ 
+  
+  function preprocess(data) {
+    var k = data[0].length;
+    for (var i = 0; i < data[0].length; i++) {
+      if (data[0][i] == undefined) {
+        k = i;
+        break;
+      }
+    }
+    var section = data.slice(0, data.length).map(i => i.slice(0, k));
+    return section;
+  }
+
+  function exportData() {
+    console.log("Export Started");
+    var XLSX = require('xlsx');
+    var wb = XLSX.utils.book_new();
+    for (var i = 0; i < num_bms; i++) {
+      var voldata = voltage[`bms ${i}`];
+      voldata = preprocess(voldata);
+      var curdata = current[i];
+      var tempdata = temp[`bms ${i}`];
+      tempdata = preprocess(tempdata);
+
+      var head = ['Current'];
+      for (var j = 0; j < voldata[0].length; j++) {
+        head.push('V '.concat(j + 1));
+      }
+      for (var j = 0; j < tempdata[0].length; j++) {
+        head.push('T '.concat(j + 1));
+      }
+
+      var result = [head];
+      for (var j = 0; j < voldata.length; j++) {
+        var row = [curdata].concat(voldata[j]);
+        row = row.concat(tempdata[j]);
+        result.push(row);
+      }
+      var ws = XLSX.utils.aoa_to_sheet(result);
+      XLSX.utils.book_append_sheet(wb, ws, "BMS ".concat(i));
+    }
+    var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "DataFile.xlsx");
+    console.log("Exported");
+  }
   
   
     return (
         <Container>
-            <Heading children="Dynamic data"/>
+            <HeadingRow >
+              <Heading children="Dynamic data"/>
+              
+              <GreenButton onClick={()=>exportData()}>Export</GreenButton>
+
+            </HeadingRow>
+      <HeadingRow>
+      <VoltageRadialChart index={showGraph} graphData={voltage} />
+      <TempRadialChart index2={showGraph} graphData2={temp}/>
+      </HeadingRow>
       <SizedBox/>
-     
       { <TableContainer>
       <BMSTable
             columns={columns}

@@ -59,34 +59,52 @@ font-weight : 700;
 const HeaderRow = () => {
   const bms = useSelector((state) => state.bms);
   const cells = useSelector((state) => state.cells);
+  const deviceConnected = useSelector((state) => state.deviceConnected);
   const dispatch = useDispatch()
 
 
   useEffect(() => {
-    dispatch(dataAction.setBMS());
-    dispatch(dataAction.setCells());
-
-  }, [])
+    if(deviceConnected == true){
+      dispatch(dataAction.setBMS());
+      dispatch(dataAction.setCells());
+      dispatch(dataAction.setVoltage(27));   
+      dispatch(dataAction.setTemp(8)); 
+      dispatch(dataAction.setCurrent(78));  
+    }  
+  }, [deviceConnected])
+  
+  useEffect(() => {
+    if(deviceConnected == true){
+      const interval = setInterval(()=>{
+        dispatch(dataAction.setVoltage(27));
+        dispatch(dataAction.setTemp(8));   
+        dispatch(dataAction.setCurrent(78)); 
+      },4000)
+    
+      return () => {
+        clearInterval(interval);
+      }
+    }
+  }, [deviceConnected])
   
 
   return (
     <Container>
       <Header>
         <Heading children="Dashboard - BMS"/>
-        <GreenButton onClick={()=>read()}>Pair BMS</GreenButton>
+        <GreenButton onClick={()=>{
+          read();
+          dispatch(dataAction.setDeviceConnected(true));
+        }}>Pair BMS</GreenButton>
       </Header>
      
       <SizedBox2/>
       <Row gutter={[12,12]}>
-      <Col onClick={()=>{
-        dispatch(dataAction.setVoltage(27));   
-        dispatch(dataAction.setTemp(8)); 
-        dispatch(dataAction.setCurrent(78));    
-      }}>
+      <Col>
         <FeatureContainer style={{
             backgroundColor: '#B4F1FF', 
           }} >
-        <Heading style={{color:'grey'}}>1</Heading>
+        <Heading style={{color:'grey'}}>{bms==0? "No Device" : 1}</Heading>
         <SizedBox/>
         <SmallTwo children='Master BMS'/>
         </FeatureContainer>
@@ -95,7 +113,7 @@ const HeaderRow = () => {
         <FeatureContainer style={{
             backgroundColor: '#B4F1FF', 
           }} >
-        <Heading style={{color:'grey'}}>{bms-1}</Heading>
+        <Heading style={{color:'grey'}}>{bms==0? "No Device" : bms-1}</Heading>
         <SizedBox/>
         <SmallTwo children='Number of Slaves BMS'/>
         </FeatureContainer>
@@ -104,7 +122,7 @@ const HeaderRow = () => {
         <FeatureContainer style={{
           backgroundColor: 'white', 
         }} >
-        <Heading style={{color:'grey'}}>{cells}</Heading>
+        <Heading style={{color:'grey'}}>{bms==0? "No Device" : cells}</Heading>
         <SizedBox/>
         <SmallTwo children="Total number of cells"/>
         </FeatureContainer>

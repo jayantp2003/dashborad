@@ -1,3 +1,5 @@
+
+
 let bluetoothDeviceConnected;
 let gattRxCharecteristic;
 let gattTxCharecteristic;
@@ -5,6 +7,7 @@ let gattTxCharecteristic;
 const bleService 		  = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
 const bleRxCharecteristic = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
 const bleTxCharecteristic = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
 
 export function isWebBluetoothEnabled() {
 	if (navigator.bluetooth) {
@@ -29,14 +32,14 @@ export async function getDeviceInfo() {
 
 	let options = {
 		acceptAllDevices: true,
-		optionalServices: [bleService]
+		// optionalServices: [bleService]
 	};
 
 	try {
 		console.log('Requesting Bluetooth Device...');
 		console.log('with ' + JSON.stringify(options));
 		bluetoothDeviceConnected = await navigator.bluetooth.requestDevice(options);
-
+		
 		console.log('> Name:             ' + bluetoothDeviceConnected.name);
 		console.log('> Id:               ' + bluetoothDeviceConnected.id);
 		console.log('> Connected:        ' + bluetoothDeviceConnected.gatt.connected);
